@@ -1,5 +1,3 @@
-// StartMeeting.js
-
 import { useState } from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -24,11 +22,6 @@ function StartMeeting() {
   const [attendance, setAttendance] = useState(
     officers.reduce((acc, officer) => { acc[officer] = false; return acc; }, {})
   );
-
-  const handleAttendanceToggle = (officer) => {
-    setAttendance(prev => ({ ...prev, [officer]: !prev[officer] }));
-  };
-
   const [reports, setReports] = useState({
     president: '', vicePresident: '', treasurer: '', secretary: '', execBoardChair: '',
     shiftReps: { Bender: '', Volmer: '', Dalton: '' },
@@ -40,9 +33,16 @@ function StartMeeting() {
     communicationAndBills: ''
   });
 
+  const handleAttendanceToggle = (officer) => {
+    setAttendance(prev => ({ ...prev, [officer]: !prev[officer] }));
+  };
+
   const handleReportChange = (field, value, subfield = null) => {
     if (subfield) {
-      setReports(prev => ({ ...prev, [field]: { ...prev[field], [subfield]: value } }));
+      setReports(prev => ({
+        ...prev,
+        [field]: { ...prev[field], [subfield]: value }
+      }));
     } else {
       setReports(prev => ({ ...prev, [field]: value }));
     }
@@ -59,7 +59,6 @@ function StartMeeting() {
       />
     </div>
   );
-
   const [sections, setSections] = useState({
     goodWelfare: { text: '', motions: [] },
     unfinishedBusiness: { text: '', motions: [] },
@@ -71,13 +70,19 @@ function StartMeeting() {
   });
 
   const handleSectionChange = (section, value) => {
-    setSections(prev => ({ ...prev, [section]: { ...prev[section], text: value } }));
+    setSections(prev => ({
+      ...prev,
+      [section]: { ...prev[section], text: value }
+    }));
   };
 
   const addMotion = (section) => {
     setSections(prev => ({
       ...prev,
-      [section]: { ...prev[section], motions: [...prev[section].motions, createMotion()] }
+      [section]: {
+        ...prev[section],
+        motions: [...prev[section].motions, createMotion()]
+      }
     }));
   };
 
@@ -91,12 +96,12 @@ function StartMeeting() {
 
   const renderMotionFields = (motion, section, motionIndex) => (
     <div style={{ border: '1px solid #ccc', padding: '10px', marginBottom: '10px' }}>
-      <TextField label="Motion made by" fullWidth value={motion.madeBy} onChange={(e) => updateMotion(section, motionIndex, 'madeBy', e.target.value)} />
-      <TextField label="Second by" fullWidth value={motion.secondBy} onChange={(e) => updateMotion(section, motionIndex, 'secondBy', e.target.value)} />
-      <TextField label="Discussion" fullWidth value={motion.discussion} onChange={(e) => updateMotion(section, motionIndex, 'discussion', e.target.value)} />
-      <TextField label="In Favor" fullWidth value={motion.inFavor} onChange={(e) => updateMotion(section, motionIndex, 'inFavor', e.target.value)} />
-      <TextField label="Opposed" fullWidth value={motion.opposed} onChange={(e) => updateMotion(section, motionIndex, 'opposed', e.target.value)} />
-      <TextField label="Abstain" fullWidth value={motion.abstain} onChange={(e) => updateMotion(section, motionIndex, 'abstain', e.target.value)} />
+      <TextField label=\"Motion made by\" fullWidth value={motion.madeBy} onChange={(e) => updateMotion(section, motionIndex, 'madeBy', e.target.value)} />
+      <TextField label=\"Second by\" fullWidth value={motion.secondBy} onChange={(e) => updateMotion(section, motionIndex, 'secondBy', e.target.value)} />
+      <TextField label=\"Discussion\" fullWidth value={motion.discussion} onChange={(e) => updateMotion(section, motionIndex, 'discussion', e.target.value)} />
+      <TextField label=\"In Favor\" fullWidth value={motion.inFavor} onChange={(e) => updateMotion(section, motionIndex, 'inFavor', e.target.value)} />
+      <TextField label=\"Opposed\" fullWidth value={motion.opposed} onChange={(e) => updateMotion(section, motionIndex, 'opposed', e.target.value)} />
+      <TextField label=\"Abstain\" fullWidth value={motion.abstain} onChange={(e) => updateMotion(section, motionIndex, 'abstain', e.target.value)} />
     </div>
   );
 
@@ -117,29 +122,58 @@ function StartMeeting() {
       ))}
     </div>
   );
-
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <h2>Start New Meeting</h2>
 
-      <DatePicker label="Meeting Date" value={meetingDate} onChange={(newValue) => setMeetingDate(newValue)} />
-      <TimePicker label="Call to Order Time" value={callToOrderTime} onChange={(newValue) => setCallToOrderTime(newValue)} />
+      <DatePicker
+        label="Meeting Date"
+        value={meetingDate}
+        onChange={(newValue) => setMeetingDate(newValue)}
+      />
+
+      <TimePicker
+        label="Call to Order Time"
+        value={callToOrderTime}
+        onChange={(newValue) => setCallToOrderTime(newValue)}
+      />
 
       <FormControl fullWidth style={{ marginTop: '20px' }}>
         <InputLabel>Presiding Officer</InputLabel>
-        <Select value={presidingOfficer} onChange={(e) => setPresidingOfficer(e.target.value)}>
+        <Select
+          value={presidingOfficer}
+          onChange={(e) => setPresidingOfficer(e.target.value)}
+        >
           {officers.map((officer) => (
             <MenuItem key={officer} value={officer}>{officer}</MenuItem>
           ))}
         </Select>
       </FormControl>
 
-      <TextField label="Members Present" multiline fullWidth value={membersPresent} onChange={(e) => setMembersPresent(e.target.value)} style={{ marginTop: '20px' }} />
-      <TextField label="Additions to the Agenda" fullWidth value={agendaAdditions} onChange={(e) => setAgendaAdditions(e.target.value)} style={{ marginTop: '20px' }} />
+      <TextField
+        label="Members Present"
+        multiline
+        fullWidth
+        value={membersPresent}
+        onChange={(e) => setMembersPresent(e.target.value)}
+        style={{ marginTop: '20px' }}
+      />
+
+      <TextField
+        label="Additions to the Agenda"
+        fullWidth
+        value={agendaAdditions}
+        onChange={(e) => setAgendaAdditions(e.target.value)}
+        style={{ marginTop: '20px' }}
+      />
 
       <h3>Roll Call of Officers</h3>
       {officers.map((officer) => (
-        <FormControlLabel key={officer} control={<Switch checked={attendance[officer]} onChange={() => handleAttendanceToggle(officer)} color="primary" />} label={`${officer}: ${attendance[officer] ? 'Present' : 'Absent'}`} />
+        <FormControlLabel
+          key={officer}
+          control={<Switch checked={attendance[officer]} onChange={() => handleAttendanceToggle(officer)} color="primary" />}
+          label={`${officer}: ${attendance[officer] ? 'Present' : 'Absent'}`}
+        />
       ))}
 
       <h3>Reports of Officers and Committees</h3>
@@ -160,7 +194,24 @@ function StartMeeting() {
       ))}
 
       <h4>Committees</h4>
-      {renderReportField(\"Union Apparel Committee - AJ, Brandenburg\", 'committees', 'unionApparel')}
-      {renderReportField(\"Safety Committee (Grismer, Vacant, Hoagland)\", 'committees', 'safetyCommittee')}
-      {renderReportField(\"Peer Support (C. Ferguson, Richardson, Gilson)\", 'c
+      {renderReportField("Union Apparel Committee - AJ, Brandenburg", 'committees', 'unionApparel')}
+      {renderReportField("Safety Committee (Grismer, Vacant, Hoagland)", 'committees', 'safetyCommittee')}
+      {renderReportField("Peer Support (C. Ferguson, Richardson, Gilson)", 'committees', 'peerSupport')}
+      {renderReportField("HR Committee (BWC, Pension, Healthcare/Insurance)", 'committees', 'hrCommittee')}
+      {renderReportField("BWC (Committee Chair Richards)", 'committees', 'bwc')}
+      {renderReportField("Pension (Grismer)", 'committees', 'pension')}
+      {renderReportField("Healthcare/Insurance (Heaton)", 'committees', 'healthcareInsurance')}
+      {renderReportField("PR Committee", 'committees', 'prCommittee')}
+      {renderReportField("Gala Committee", 'committees', 'galaCommittee')}
 
+      <h4>Communication and Bills</h4>
+      {renderReportField("Communication and Bills", 'communicationAndBills')}
+
+      {renderSection('GOOD WELFARE', 'goodWelfare')}
+      {renderSection('UNFINISHED BUSINESS', 'unfinishedBusiness')}
+      {renderSection('NEW BUSINESS', 'newBusiness')}
+
+    </LocalizationProvider>
+  );
+}
+export default StartMeeting;
