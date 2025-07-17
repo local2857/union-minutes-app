@@ -1,9 +1,11 @@
+// StartMeeting.js
+
 import { useState } from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-import { TextField, FormControl, InputLabel, Select, MenuItem, FormControlLabel, Switch, Button, Checkbox, FormGroup } from '@mui/material';
+import { TextField, FormControl, InputLabel, Select, MenuItem, FormControlLabel, Switch, Button } from '@mui/material';
 import dayjs from 'dayjs';
 
 function StartMeeting() {
@@ -14,28 +16,49 @@ function StartMeeting() {
   const [agendaAdditions, setAgendaAdditions] = useState('None');
 
   const officers = [
-    'President Heaton',
-    'Vice President Richards',
-    'Secretary Norris',
-    'Treasurer Ransdell',
-    'A Shift Rep. Bender',
-    'B Shift Rep. Volmer',
-    'C Shift Rep. Dalton',
-    'Trustee Shaw',
-    'Trustee Trick',
-    'Trustee Renacs'
+    'President Heaton', 'Vice President Richards', 'Secretary Norris', 'Treasurer Ransdell',
+    'A Shift Rep. Bender', 'B Shift Rep. Volmer', 'C Shift Rep. Dalton',
+    'Trustee Shaw', 'Trustee Trick', 'Trustee Renacs'
   ];
 
   const [attendance, setAttendance] = useState(
-    officers.reduce((acc, officer) => {
-      acc[officer] = false;
-      return acc;
-    }, {})
+    officers.reduce((acc, officer) => { acc[officer] = false; return acc; }, {})
   );
 
   const handleAttendanceToggle = (officer) => {
     setAttendance(prev => ({ ...prev, [officer]: !prev[officer] }));
   };
+
+  const [reports, setReports] = useState({
+    president: '', vicePresident: '', treasurer: '', secretary: '', execBoardChair: '',
+    shiftReps: { Bender: '', Volmer: '', Dalton: '' },
+    trustees: { Shaw: '', Trick: '', Renacs: '' },
+    committees: {
+      unionApparel: '', safetyCommittee: '', peerSupport: '', hrCommittee: '',
+      bwc: '', pension: '', healthcareInsurance: '', prCommittee: '', galaCommittee: ''
+    },
+    communicationAndBills: ''
+  });
+
+  const handleReportChange = (field, value, subfield = null) => {
+    if (subfield) {
+      setReports(prev => ({ ...prev, [field]: { ...prev[field], [subfield]: value } }));
+    } else {
+      setReports(prev => ({ ...prev, [field]: value }));
+    }
+  };
+
+  const renderReportField = (label, field, subfield = null) => (
+    <div style={{ marginBottom: '10px' }}>
+      <TextField
+        label={label}
+        fullWidth
+        multiline
+        value={subfield ? reports[field][subfield] : reports[field]}
+        onChange={(e) => handleReportChange(field, e.target.value, subfield)}
+      />
+    </div>
+  );
 
   const [sections, setSections] = useState({
     goodWelfare: { text: '', motions: [] },
@@ -44,29 +67,17 @@ function StartMeeting() {
   });
 
   const createMotion = () => ({
-    madeBy: '',
-    secondBy: '',
-    discussion: '',
-    inFavor: '',
-    opposed: '',
-    abstain: '',
-    subMotion: null
+    madeBy: '', secondBy: '', discussion: '', inFavor: '', opposed: '', abstain: '', subMotion: null
   });
 
   const handleSectionChange = (section, value) => {
-    setSections(prev => ({
-      ...prev,
-      [section]: { ...prev[section], text: value }
-    }));
+    setSections(prev => ({ ...prev, [section]: { ...prev[section], text: value } }));
   };
 
   const addMotion = (section) => {
     setSections(prev => ({
       ...prev,
-      [section]: {
-        ...prev[section],
-        motions: [...prev[section].motions, createMotion()]
-      }
+      [section]: { ...prev[section], motions: [...prev[section].motions, createMotion()] }
     }));
   };
 
@@ -78,42 +89,14 @@ function StartMeeting() {
     });
   };
 
-  const addSubMotion = (section, motionIndex) => {
-    setSections(prev => {
-      const updatedMotions = [...prev[section].motions];
-      updatedMotions[motionIndex].subMotion = createMotion();
-      return { ...prev, [section]: { ...prev[section], motions: updatedMotions } };
-    });
-  };
-
-  const addSubSubMotion = (section, motionIndex) => {
-    setSections(prev => {
-      const updatedMotions = [...prev[section].motions];
-      if (updatedMotions[motionIndex].subMotion) {
-        updatedMotions[motionIndex].subMotion.subMotion = createMotion();
-      }
-      return { ...prev, [section]: { ...prev[section], motions: updatedMotions } };
-    });
-  };
-
-  const renderMotionFields = (motion, section, motionIndex, isSub = false, isSubSub = false) => (
-    <div style={{ marginLeft: isSub ? '20px' : isSubSub ? '40px' : '0', border: '1px solid #ccc', padding: '10px', marginBottom: '10px' }}>
+  const renderMotionFields = (motion, section, motionIndex) => (
+    <div style={{ border: '1px solid #ccc', padding: '10px', marginBottom: '10px' }}>
       <TextField label="Motion made by" fullWidth value={motion.madeBy} onChange={(e) => updateMotion(section, motionIndex, 'madeBy', e.target.value)} />
       <TextField label="Second by" fullWidth value={motion.secondBy} onChange={(e) => updateMotion(section, motionIndex, 'secondBy', e.target.value)} />
       <TextField label="Discussion" fullWidth value={motion.discussion} onChange={(e) => updateMotion(section, motionIndex, 'discussion', e.target.value)} />
       <TextField label="In Favor" fullWidth value={motion.inFavor} onChange={(e) => updateMotion(section, motionIndex, 'inFavor', e.target.value)} />
       <TextField label="Opposed" fullWidth value={motion.opposed} onChange={(e) => updateMotion(section, motionIndex, 'opposed', e.target.value)} />
       <TextField label="Abstain" fullWidth value={motion.abstain} onChange={(e) => updateMotion(section, motionIndex, 'abstain', e.target.value)} />
-
-      {!motion.subMotion && !isSubSub && (
-        <Button onClick={() => addSubMotion(section, motionIndex)}>Make a motion to a motion</Button>
-      )}
-
-      {motion.subMotion && renderMotionFields(motion.subMotion, section, motionIndex, true)}
-
-      {motion.subMotion && !motion.subMotion.subMotion && (
-        <Button onClick={() => addSubSubMotion(section, motionIndex)}>Make a motion to a motion to a motion</Button>
-      )}
     </div>
   );
 
@@ -139,62 +122,46 @@ function StartMeeting() {
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <h2>Start New Meeting</h2>
 
-      <DatePicker
-        label="Meeting Date"
-        value={meetingDate}
-        onChange={(newValue) => setMeetingDate(newValue)}
-      />
-
-      <TimePicker
-        label="Call to Order Time"
-        value={callToOrderTime}
-        onChange={(newValue) => setCallToOrderTime(newValue)}
-      />
+      <DatePicker label="Meeting Date" value={meetingDate} onChange={(newValue) => setMeetingDate(newValue)} />
+      <TimePicker label="Call to Order Time" value={callToOrderTime} onChange={(newValue) => setCallToOrderTime(newValue)} />
 
       <FormControl fullWidth style={{ marginTop: '20px' }}>
         <InputLabel>Presiding Officer</InputLabel>
-        <Select
-          value={presidingOfficer}
-          onChange={(e) => setPresidingOfficer(e.target.value)}
-        >
+        <Select value={presidingOfficer} onChange={(e) => setPresidingOfficer(e.target.value)}>
           {officers.map((officer) => (
             <MenuItem key={officer} value={officer}>{officer}</MenuItem>
           ))}
         </Select>
       </FormControl>
 
-      <TextField
-        label="Members Present"
-        multiline
-        fullWidth
-        value={membersPresent}
-        onChange={(e) => setMembersPresent(e.target.value)}
-        style={{ marginTop: '20px' }}
-      />
-
-      <TextField
-        label="Additions to the Agenda"
-        fullWidth
-        value={agendaAdditions}
-        onChange={(e) => setAgendaAdditions(e.target.value)}
-        style={{ marginTop: '20px' }}
-      />
+      <TextField label="Members Present" multiline fullWidth value={membersPresent} onChange={(e) => setMembersPresent(e.target.value)} style={{ marginTop: '20px' }} />
+      <TextField label="Additions to the Agenda" fullWidth value={agendaAdditions} onChange={(e) => setAgendaAdditions(e.target.value)} style={{ marginTop: '20px' }} />
 
       <h3>Roll Call of Officers</h3>
       {officers.map((officer) => (
-        <FormControlLabel
-          key={officer}
-          control={<Switch checked={attendance[officer]} onChange={() => handleAttendanceToggle(officer)} color="primary" />}
-          label={`${officer}: ${attendance[officer] ? 'Present' : 'Absent'}`}
-        />
+        <FormControlLabel key={officer} control={<Switch checked={attendance[officer]} onChange={() => handleAttendanceToggle(officer)} color="primary" />} label={`${officer}: ${attendance[officer] ? 'Present' : 'Absent'}`} />
       ))}
 
-      {renderSection('GOOD WELFARE', 'goodWelfare')}
-      {renderSection('UNFINISHED BUSINESS', 'unfinishedBusiness')}
-      {renderSection('NEW BUSINESS', 'newBusiness')}
+      <h3>Reports of Officers and Committees</h3>
+      {renderReportField(\"President's Report\", 'president')}
+      {renderReportField(\"Vice President’s Report\", 'vicePresident')}
+      {renderReportField(\"Treasurer’s Report\", 'treasurer')}
+      {renderReportField(\"Secretary’s Report\", 'secretary')}
+      {renderReportField(\"Executive Board Chair Report\", 'execBoardChair')}
 
-    </LocalizationProvider>
-  );
-}
+      <h4>Shift Reps</h4>
+      {['Bender', 'Volmer', 'Dalton'].map(rep => (
+        renderReportField(`${rep}:`, 'shiftReps', rep)
+      ))}
 
-export default StartMeeting;
+      <h4>Trustees</h4>
+      {['Shaw', 'Trick', 'Renacs'].map(trustee => (
+        renderReportField(`${trustee}:`, 'trustees', trustee)
+      ))}
+
+      <h4>Committees</h4>
+      {renderReportField(\"Union Apparel Committee - AJ, Brandenburg\", 'committees', 'unionApparel')}
+      {renderReportField(\"Safety Committee (Grismer, Vacant, Hoagland)\", 'committees', 'safetyCommittee')}
+      {renderReportField(\"Peer Support (C. Ferguson, Richardson, Gilson)\", 'c
+
+        
