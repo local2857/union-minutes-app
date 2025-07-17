@@ -9,101 +9,113 @@ import dayjs from 'dayjs';
 function StartMeeting() {
   // Existing states...
 
-  const initialReports = {
-    president: '',
-    vicePresident: '',
-    treasurer: '',
-    secretary: '',
-    execBoardChair: '',
-    shiftReps: {
-      Bendert: '',
-      Volmer: '',
-      Dalton: ''
-    },
-    trustees: {
-      Shaw: '',
-      Trick: '',
-      Renacs: ''
-    },
-    committees: {
-      unionApparel: '',
-      safetyCommittee: '',
-      peerSupport: '',
-      hrCommittee: '',
-      bwc: '',
-      pension: '',
-      healthcareInsurance: '',
-      prCommittee: '',
-      galaCommittee: ''
-    },
-    communicationAndBills: ''
+  const [sections, setSections] = useState({
+    goodWelfare: { text: '', motions: [] },
+    unfinishedBusiness: { text: '', motions: [] },
+    newBusiness: { text: '', motions: [] }
+  });
+
+  const createMotion = () => ({
+    madeBy: '',
+    secondBy: '',
+    discussion: '',
+    inFavor: '',
+    opposed: '',
+    abstain: '',
+    subMotion: null
+  });
+
+  const handleSectionChange = (section, value) => {
+    setSections(prev => ({
+      ...prev,
+      [section]: { ...prev[section], text: value }
+    }));
   };
 
-  const [reports, setReports] = useState(initialReports);
-
-  const handleReportChange = (field, value, subfield = null) => {
-    if (subfield) {
-      setReports(prev => ({
-        ...prev,
-        [field]: {
-          ...prev[field],
-          [subfield]: value
-        }
-      }));
-    } else {
-      setReports(prev => ({ ...prev, [field]: value }));
-    }
+  const addMotion = (section) => {
+    setSections(prev => ({
+      ...prev,
+      [section]: {
+        ...prev[section],
+        motions: [...prev[section].motions, createMotion()]
+      }
+    }));
   };
 
-  const setNoReport = (field, subfield = null) => {
-    handleReportChange(field, 'No Report', subfield);
+  const updateMotion = (section, motionIndex, field, value) => {
+    setSections(prev => {
+      const updatedMotions = [...prev[section].motions];
+      updatedMotions[motionIndex][field] = value;
+      return { ...prev, [section]: { ...prev[section], motions: updatedMotions } };
+    });
   };
 
-  const renderReportField = (label, field, subfield = null) => (
-    <div style={{ marginBottom: '10px' }}>
+  const addSubMotion = (section, motionIndex) => {
+    setSections(prev => {
+      const updatedMotions = [...prev[section].motions];
+      updatedMotions[motionIndex].subMotion = createMotion();
+      return { ...prev, [section]: { ...prev[section], motions: updatedMotions } };
+    });
+  };
+
+  const addSubSubMotion = (section, motionIndex) => {
+    setSections(prev => {
+      const updatedMotions = [...prev[section].motions];
+      if (updatedMotions[motionIndex].subMotion) {
+        updatedMotions[motionIndex].subMotion.subMotion = createMotion();
+      }
+      return { ...prev, [section]: { ...prev[section], motions: updatedMotions } };
+    });
+  };
+
+  const renderMotionFields = (motion, section, motionIndex, isSub = false, isSubSub = false) => (
+    <div style={{ marginLeft: isSub ? '20px' : isSubSub ? '40px' : '0', border: '1px solid #ccc', padding: '10px', marginBottom: '10px' }}>
+      <TextField label="Motion made by" fullWidth value={motion.madeBy} onChange={(e) => updateMotion(section, motionIndex, 'madeBy', e.target.value)} />
+      <TextField label="Second by" fullWidth value={motion.secondBy} onChange={(e) => updateMotion(section, motionIndex, 'secondBy', e.target.value)} />
+      <TextField label="Discussion" fullWidth value={motion.discussion} onChange={(e) => updateMotion(section, motionIndex, 'discussion', e.target.value)} />
+      <TextField label="In Favor" fullWidth value={motion.inFavor} onChange={(e) => updateMotion(section, motionIndex, 'inFavor', e.target.value)} />
+      <TextField label="Opposed" fullWidth value={motion.opposed} onChange={(e) => updateMotion(section, motionIndex, 'opposed', e.target.value)} />
+      <TextField label="Abstain" fullWidth value={motion.abstain} onChange={(e) => updateMotion(section, motionIndex, 'abstain', e.target.value)} />
+
+      {!motion.subMotion && !isSubSub && (
+        <Button onClick={() => addSubMotion(section, motionIndex)}>Make a motion to a motion</Button>
+      )}
+
+      {motion.subMotion && renderMotionFields(motion.subMotion, section, motionIndex, true)}
+
+      {motion.subMotion && !motion.subMotion.subMotion && (
+        <Button onClick={() => addSubSubMotion(section, motionIndex)}>Make a motion to a motion to a motion</Button>
+      )}
+    </div>
+  );
+
+  const renderSection = (label, sectionKey) => (
+    <div style={{ marginTop: '20px' }}>
+      <h3>{label}</h3>
       <TextField
-        label={label}
-        fullWidth
+        label={`${label} Notes`}
         multiline
-        value={subfield ? reports[field][subfield] : reports[field]}
-        onChange={(e) => handleReportChange(field, e.target.value, subfield)}
+        fullWidth
+        value={sections[sectionKey].text}
+        onChange={(e) => handleSectionChange(sectionKey, e.target.value)}
       />
-      <Button onClick={() => setNoReport(field, subfield)} style={{ marginTop: '5px' }}>No Report</Button>
+      <Button onClick={() => addMotion(sectionKey)} style={{ marginTop: '10px' }}>Make a Motion</Button>
+
+      {sections[sectionKey].motions.map((motion, index) => (
+        renderMotionFields(motion, sectionKey, index)
+      ))}
     </div>
   );
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <h3>Reports of Officers and Committees</h3>
-      {renderReportField("President's Report", 'president')}
-      {renderReportField("Vice President’s Report", 'vicePresident')}
-      {renderReportField("Treasurer’s Report", 'treasurer')}
-      {renderReportField("Secretary’s Report", 'secretary')}
-      {renderReportField("Executive Board Chair Report", 'execBoardChair')}
+      {/* Existing components */}
 
-      <h4>Shift Reps</h4>
-      {['Bendert', 'Volmer', 'Dalton'].map(rep => (
-        renderReportField(`${rep}:`, 'shiftReps', rep)
-      ))}
+      {renderSection('GOOD WELFARE', 'goodWelfare')}
+      {renderSection('UNFINISHED BUSINESS', 'unfinishedBusiness')}
+      {renderSection('NEW BUSINESS', 'newBusiness')}
 
-      <h4>Trustees</h4>
-      {['Shaw', 'Trick', 'Renacs'].map(trustee => (
-        renderReportField(`${trustee}:`, 'trustees', trustee)
-      ))}
-
-      <h4>Committees</h4>
-      {renderReportField("Union Apparel Committee - AJ, Brandenburg", 'committees', 'unionApparel')}
-      {renderReportField("Safety Committee (Grismer, Vacant, Hoagland)", 'committees', 'safetyCommittee')}
-      {renderReportField("Peer Support (C. Ferguson, Richardson, Gilson)", 'committees', 'peerSupport')}
-      {renderReportField("HR Committee (BWC, Pension, Healthcare/Insurance)", 'committees', 'hrCommittee')}
-      {renderReportField("BWC (Committee Chair Richards)", 'committees', 'bwc')}
-      {renderReportField("Pension (Grismer)", 'committees', 'pension')}
-      {renderReportField("Healthcare/Insurance (Heaton)", 'committees', 'healthcareInsurance')}
-      {renderReportField("PR Committee", 'committees', 'prCommittee')}
-      {renderReportField("Gala Committee", 'committees', 'galaCommittee')}
-
-      <h4>Communication and Bills</h4>
-      {renderReportField("Communication and Bills", 'communicationAndBills')}
+      {/* Existing components */}
     </LocalizationProvider>
   );
 }
