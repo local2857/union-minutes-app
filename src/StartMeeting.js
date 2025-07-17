@@ -96,12 +96,12 @@ function StartMeeting() {
 
   const renderMotionFields = (motion, section, motionIndex) => (
     <div style={{ border: '1px solid #ccc', padding: '10px', marginBottom: '10px' }}>
-      <TextField label=\"Motion made by\" fullWidth value={motion.madeBy} onChange={(e) => updateMotion(section, motionIndex, 'madeBy', e.target.value)} />
-      <TextField label=\"Second by\" fullWidth value={motion.secondBy} onChange={(e) => updateMotion(section, motionIndex, 'secondBy', e.target.value)} />
-      <TextField label=\"Discussion\" fullWidth value={motion.discussion} onChange={(e) => updateMotion(section, motionIndex, 'discussion', e.target.value)} />
-      <TextField label=\"In Favor\" fullWidth value={motion.inFavor} onChange={(e) => updateMotion(section, motionIndex, 'inFavor', e.target.value)} />
-      <TextField label=\"Opposed\" fullWidth value={motion.opposed} onChange={(e) => updateMotion(section, motionIndex, 'opposed', e.target.value)} />
-      <TextField label=\"Abstain\" fullWidth value={motion.abstain} onChange={(e) => updateMotion(section, motionIndex, 'abstain', e.target.value)} />
+      <TextField label="Motion made by" fullWidth value={motion.madeBy} onChange={(e) => updateMotion(section, motionIndex, 'madeBy', e.target.value)} />
+      <TextField label="Second by" fullWidth value={motion.secondBy} onChange={(e) => updateMotion(section, motionIndex, 'secondBy', e.target.value)} />
+      <TextField label="Discussion" fullWidth value={motion.discussion} onChange={(e) => updateMotion(section, motionIndex, 'discussion', e.target.value)} />
+      <TextField label="In Favor" fullWidth value={motion.inFavor} onChange={(e) => updateMotion(section, motionIndex, 'inFavor', e.target.value)} />
+      <TextField label="Opposed" fullWidth value={motion.opposed} onChange={(e) => updateMotion(section, motionIndex, 'opposed', e.target.value)} />
+      <TextField label="Abstain" fullWidth value={motion.abstain} onChange={(e) => updateMotion(section, motionIndex, 'abstain', e.target.value)} />
     </div>
   );
 
