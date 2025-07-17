@@ -143,11 +143,11 @@ function StartMeeting() {
       ))}
 
       <h3>Reports of Officers and Committees</h3>
-      {renderReportField(\"President's Report\", 'president')}
-      {renderReportField(\"Vice President’s Report\", 'vicePresident')}
-      {renderReportField(\"Treasurer’s Report\", 'treasurer')}
-      {renderReportField(\"Secretary’s Report\", 'secretary')}
-      {renderReportField(\"Executive Board Chair Report\", 'execBoardChair')}
+      {renderReportField("President's Report", 'president')}
+      {renderReportField("Vice President’s Report", 'vicePresident')}
+      {renderReportField("Treasurer’s Report", 'treasurer')}
+      {renderReportField("Secretary’s Report", 'secretary')}
+      {renderReportField("Executive Board Chair Report", 'execBoardChair')}
 
       <h4>Shift Reps</h4>
       {['Bender', 'Volmer', 'Dalton'].map(rep => (
@@ -164,4 +164,3 @@ function StartMeeting() {
       {renderReportField(\"Safety Committee (Grismer, Vacant, Hoagland)\", 'committees', 'safetyCommittee')}
       {renderReportField(\"Peer Support (C. Ferguson, Richardson, Gilson)\", 'c
 
-        
